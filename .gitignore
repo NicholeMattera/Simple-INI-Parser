@@ -6,3 +6,4 @@ example/**/*.nro
 release
 lib
 .vscode
+*.tar.bz2
