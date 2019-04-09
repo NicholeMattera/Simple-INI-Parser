@@ -1,4 +1,8 @@
 debug
+example/**/build
+example/**/*.elf
+example/**/*.nacp
+example/**/*.nro
 release
 lib
 .vscode

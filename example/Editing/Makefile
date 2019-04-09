@@ -6,40 +6,67 @@ ifeq ($(strip $(DEVKITPRO)),)
 $(error "Please set DEVKITPRO in your environment. export DEVKITPRO=<path to>/devkitpro")
 endif
 
-include $(DEVKITPRO)/devkitA64/base_rules
+TOPDIR ?= $(CURDIR)
+include $(DEVKITPRO)/libnx/switch_rules
 
 #---------------------------------------------------------------------------------
 # TARGET is the name of the output
+# BUILD is the directory where object files & intermediate files will be placed
 # SOURCES is a list of directories containing source code
 # DATA is a list of directories containing data files
 # INCLUDES is a list of directories containing header files
+# ROMFS is the directory containing data to be added to RomFS, relative to the Makefile (Optional)
+#
+# NO_ICON: if set to anything, do not use icon.
+# NO_NACP: if set to anything, no .nacp file is generated.
+# APP_TITLE is the name of the app stored in the .nacp file (Optional)
+# APP_AUTHOR is the author of the app stored in the .nacp file (Optional)
+# APP_VERSION is the version of the app stored in the .nacp file (Optional)
+# APP_TITLEID is the titleID of the app stored in the .nacp file (Optional)
+# ICON is the filename of the icon (.jpg), relative to the project folder.
+#   If not set, it attempts to use one of the following (in this order):
+#     - <Project name>.jpg
+#     - icon.jpg
+#     - <libnx folder>/default_icon.jpg
+#
+# CONFIG_JSON is the filename of the NPDM config file (.json), relative to the project folder.
+#   If not set, it attempts to use one of the following (in this order):
+#     - <Project name>.json
+#     - config.json
+#   If a JSON file is provided or autodetected, an ExeFS PFS0 (.nsp) is built instead
+#   of a homebrew executable (.nro). This is intended to be used for sysmodules.
+#   NACP building is skipped as well.
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
-SOURCES		:=	source source/SimpleIniParser
-INCLUDES	:=	include include/SimpleIniParser
+BUILD		:=	build
+SOURCES		:=	source
+DATA		:=	data
+INCLUDES	:=	include
+ROMFS		:=	romfs
 
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
-ARCH	:=	-march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIC -ftls-model=local-exec
+ARCH	:=	-march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIE
 
-CFLAGS	:=	-g -Wall -Werror \
-			-ffunction-sections \
-			-fdata-sections \
-			$(ARCH) \
-			$(BUILD_CFLAGS)
+CFLAGS	:=	-g -Wall -O2 -ffunction-sections \
+			$(ARCH) $(DEFINES)
 
-CFLAGS	+=	$(INCLUDE)
+CFLAGS	+=	$(INCLUDE) -D__SWITCH__
 
 CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions
 
 ASFLAGS	:=	-g $(ARCH)
+LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
+
+LIBS	:= -lSimpleIniParser -lnx
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:=
+LIBDIRS	:= $(PORTLIBS) $(LIBNX)
+
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
@@ -48,8 +75,13 @@ LIBDIRS	:=
 ifneq ($(BUILD),$(notdir $(CURDIR)))
 #---------------------------------------------------------------------------------
 
+export OUTPUT	:=	$(CURDIR)/$(TARGET)
+export TOPDIR	:=	$(CURDIR)
+
 export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
 			$(foreach dir,$(DATA),$(CURDIR)/$(dir))
+
+export DEPSDIR	:=	$(CURDIR)/$(BUILD)
 
 CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
@@ -73,83 +105,115 @@ endif
 export OFILES_BIN	:=	$(addsuffix .o,$(BINFILES))
 export OFILES_SRC	:=	$(CPPFILES:.cpp=.o) $(CFILES:.c=.o) $(SFILES:.s=.o)
 export OFILES 	:=	$(OFILES_BIN) $(OFILES_SRC)
-export HFILES	:=	$(addsuffix .h,$(subst .,_,$(BINFILES)))
+export HFILES_BIN	:=	$(addsuffix .h,$(subst .,_,$(BINFILES)))
 
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
-			-I. \
-			-iquote $(CURDIR)/include/switch/
+			-I$(CURDIR)/$(BUILD)
 
-.PHONY: clean all
+export LIBPATHS	:=	$(foreach dir,$(LIBDIRS),-L$(dir)/lib)
+
+ifeq ($(strip $(CONFIG_JSON)),)
+	jsons := $(wildcard *.json)
+	ifneq (,$(findstring $(TARGET).json,$(jsons)))
+		export APP_JSON := $(TOPDIR)/$(TARGET).json
+	else
+		ifneq (,$(findstring config.json,$(jsons)))
+			export APP_JSON := $(TOPDIR)/config.json
+		endif
+	endif
+else
+	export APP_JSON := $(TOPDIR)/$(CONFIG_JSON)
+endif
+
+ifeq ($(strip $(ICON)),)
+	icons := $(wildcard *.jpg)
+	ifneq (,$(findstring $(TARGET).jpg,$(icons)))
+		export APP_ICON := $(TOPDIR)/$(TARGET).jpg
+	else
+		ifneq (,$(findstring icon.jpg,$(icons)))
+			export APP_ICON := $(TOPDIR)/icon.jpg
+		endif
+	endif
+else
+	export APP_ICON := $(TOPDIR)/$(ICON)
+endif
+
+ifeq ($(strip $(NO_ICON)),)
+	export NROFLAGS += --icon=$(APP_ICON)
+endif
+
+ifeq ($(strip $(NO_NACP)),)
+	export NROFLAGS += --nacp=$(CURDIR)/$(TARGET).nacp
+endif
+
+ifneq ($(APP_TITLEID),)
+	export NACPFLAGS += --titleid=$(APP_TITLEID)
+endif
+
+ifneq ($(ROMFS),)
+	export NROFLAGS += --romfsdir=$(CURDIR)/$(ROMFS)
+endif
+
+.PHONY: $(BUILD) clean all
 
 #---------------------------------------------------------------------------------
-all: lib/lib$(TARGET).a lib/lib$(TARGET)d.a
+all: $(BUILD)
 
-lib:
+$(BUILD):
 	@[ -d $@ ] || mkdir -p $@
-
-release:
-	@[ -d $@ ] || mkdir -p $@
-
-debug:
-	@[ -d $@ ] || mkdir -p $@
-
-lib/lib$(TARGET).a : lib release $(SOURCES) $(INCLUDES)
-	@$(MAKE) BUILD=release OUTPUT=$(CURDIR)/$@ \
-	BUILD_CFLAGS="-DNDEBUG=1 -O2" \
-	DEPSDIR=$(CURDIR)/release \
-	--no-print-directory -C release \
-	-f $(CURDIR)/Makefile
-
-lib/lib$(TARGET)d.a : lib debug $(SOURCES) $(INCLUDES)
-	@$(MAKE) BUILD=debug OUTPUT=$(CURDIR)/$@ \
-	BUILD_CFLAGS="-DDEBUG=1 -Og" \
-	DEPSDIR=$(CURDIR)/debug \
-	--no-print-directory -C debug \
-	-f $(CURDIR)/Makefile
-
-dist-bin: all
-	@tar --exclude=*~ -cjf lib$(TARGET).tar.bz2 include lib
-
-dist-src:
-	@tar --exclude=*~ -cjf lib$(TARGET)-src.tar.bz2 include source Makefile
-
-dist: dist-src dist-bin
-
-install-include:
-	@cp -r include/* $(DEVKITPRO)/portlibs/switch/include/
-
-install-release:
-	@cp lib/lib$(TARGET).a $(DEVKITPRO)/portlibs/switch/lib/
-
-install-debug:
-	@cp lib/lib$(TARGET)d.a $(DEVKITPRO)/portlibs/switch/lib/
-
-install: install-include install-release
+	@$(MAKE) --no-print-directory -C $(BUILD) -f $(CURDIR)/Makefile
 
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
-	@rm -fr release debug lib *.bz2
+ifeq ($(strip $(APP_JSON)),)
+	@rm -fr $(BUILD) $(TARGET).nro $(TARGET).nacp $(TARGET).elf
+else
+	@rm -fr $(BUILD) $(TARGET).nsp $(TARGET).nso $(TARGET).npdm $(TARGET).elf
+endif
+
 
 #---------------------------------------------------------------------------------
 else
+.PHONY:	all
 
 DEPENDS	:=	$(OFILES:.o=.d)
 
 #---------------------------------------------------------------------------------
 # main targets
 #---------------------------------------------------------------------------------
-$(OUTPUT)	:	$(OFILES)
+ifeq ($(strip $(APP_JSON)),)
 
-$(OFILES_SRC)	: $(HFILES)
+all	:	$(OUTPUT).nro
+
+ifeq ($(strip $(NO_NACP)),)
+$(OUTPUT).nro	:	$(OUTPUT).elf $(OUTPUT).nacp
+else
+$(OUTPUT).nro	:	$(OUTPUT).elf
+endif
+
+else
+
+all	:	$(OUTPUT).nsp
+
+$(OUTPUT).nsp	:	$(OUTPUT).nso $(OUTPUT).npdm
+
+$(OUTPUT).nso	:	$(OUTPUT).elf
+
+endif
+
+$(OUTPUT).elf	:	$(OFILES)
+
+$(OFILES_SRC)	: $(HFILES_BIN)
 
 #---------------------------------------------------------------------------------
-%_bin.h %.bin.o	:	%.bin
+# you need a rule like this for each extension you use as binary data
+#---------------------------------------------------------------------------------
+%.bin.o	%_bin.h :	%.bin
 #---------------------------------------------------------------------------------
 	@echo $(notdir $<)
 	@$(bin2o)
-
 
 -include $(DEPENDS)
 

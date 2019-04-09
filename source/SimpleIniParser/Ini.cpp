@@ -59,6 +59,7 @@ namespace simpleIniParser {
 
         file << build();
 
+        file.flush();
         file.close();
 
         return true;
