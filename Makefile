@@ -15,6 +15,7 @@ include $(DEVKITPRO)/devkitA64/base_rules
 # INCLUDES is a list of directories containing header files
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
+VERSION		:= 	1.0.0
 SOURCES		:=	source source/SimpleIniParser
 INCLUDES	:=	include include/SimpleIniParser
 
@@ -109,23 +110,16 @@ lib/lib$(TARGET)d.a : lib debug $(SOURCES) $(INCLUDES)
 	-f $(CURDIR)/Makefile
 
 dist-bin: all
-	@tar --exclude=*~ -cjf lib$(TARGET).tar.bz2 include lib
+	@tar --exclude=*~ -cjf lib$(TARGET)-$(VERSION).tar.bz2 include lib LICENSE
 
 dist-src:
-	@tar --exclude=*~ -cjf lib$(TARGET)-src.tar.bz2 include source Makefile
+	@tar --exclude=*~ -cjf lib$(TARGET)-src-$(VERSION).tar.bz2 example include source LICENSE Makefile README.md
 
 dist: dist-src dist-bin
 
-install-include:
-	@cp -r include/* $(DEVKITPRO)/portlibs/switch/include/
-
-install-release:
-	@cp lib/lib$(TARGET).a $(DEVKITPRO)/portlibs/switch/lib/
-
-install-debug:
-	@cp lib/lib$(TARGET)d.a $(DEVKITPRO)/portlibs/switch/lib/
-
-install: install-include install-release
+install: dist-bin
+	mkdir -p $(DESTDIR)$(PORTLIBS)
+	bzip2 -cd lib$(TARGET)-$(VERSION).tar.bz2 | tar -xf - -C $(DESTDIR)$(PORTLIBS)
 
 #---------------------------------------------------------------------------------
 clean:
