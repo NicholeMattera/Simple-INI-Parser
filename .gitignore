@@ -1,3 +1,5 @@
+pkg
+src
 debug
 example/**/build
 example/**/*.elf
@@ -7,3 +9,5 @@ release
 lib
 .vscode
 *.tar.bz2
+*.tar.xz
+*.tar.gz

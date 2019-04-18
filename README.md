@@ -4,6 +4,14 @@ A library for the Nintendo Switch to be able to easily parse, modify, and create
 
 ## Installation
 
+To install the latest release run the following:
+
+```bash
+makepkg -si
+```
+
+To build from source run the following:
+
 ```bash
 make
 sudo make install
