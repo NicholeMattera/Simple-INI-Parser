@@ -14,7 +14,7 @@ include $(DEVKITPRO)/devkitA64/base_rules
 # DATA is a list of directories containing data files
 # INCLUDES is a list of directories containing header files
 #---------------------------------------------------------------------------------
-TARGET		:=	$(notdir $(CURDIR))
+TARGET		:=	SimpleIniParser
 VERSION		:= 	1.0.0
 SOURCES		:=	source source/SimpleIniParser
 INCLUDES	:=	include include/SimpleIniParser
