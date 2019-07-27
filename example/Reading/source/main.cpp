@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
 
         cout << "\nGet a specific option from a specific section.\n";
         cout << "=====================================================\n\n";
-        IniOption * option = hekateIni->findSection("config")->findFirstOption("autonogc");
+        IniOption * option = hekateIni->findSection("config")->findFirstOption("aUtOnOgC", false);
         cout << "Key: \"" << option->key << "\" | Value: \"" << option->value << "\"\n\n";
 
         delete hekateIni;

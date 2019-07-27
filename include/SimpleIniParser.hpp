@@ -18,3 +18,4 @@
 #include "SimpleIniParser/Ini.hpp"
 #include "SimpleIniParser/IniSection.hpp"
 #include "SimpleIniParser/IniOption.hpp"
+#include "SimpleIniParser/IniStringHelper.hpp"

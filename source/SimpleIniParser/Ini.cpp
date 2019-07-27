@@ -15,11 +15,13 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <algorithm> 
 #include <fstream>
 #include <iostream>
+
 #include "Ini.hpp"
 #include "IniOption.hpp"
-#include "Trim.hpp"
+#include "IniStringHelper.hpp"
 
 using namespace std;
 
@@ -44,8 +46,18 @@ namespace simpleIniParser {
         return result;
     }
 
-    IniSection * Ini::findSection(string name) {
-        auto it = find_if(sections.begin(), sections.end(), [&name](const IniSection * obj) { return obj->value == name; });
+    IniSection * Ini::findSection(string name, bool caseSensitive) {
+        if (!caseSensitive) {
+            IniStringHelper::toupper(name);
+        }
+
+        auto it = find_if(sections.begin(), sections.end(), [&name, &caseSensitive](const IniSection * obj) {
+            if (!caseSensitive) {
+                return IniStringHelper::toupper_copy(obj->value) == name;
+            }
+
+            return obj->value == name;
+        });
         if (it == sections.end())
             return nullptr;
 
@@ -73,7 +85,7 @@ namespace simpleIniParser {
         Ini * ini = new Ini();
         string line;
         while (getline(file, line)) {
-            trim(line);
+            IniStringHelper::trim(line);
 
             if (line.size() == 0)
                 continue;

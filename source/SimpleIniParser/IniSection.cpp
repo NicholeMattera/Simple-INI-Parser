@@ -15,8 +15,11 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include "IniSection.hpp"
 #include <algorithm>
+#include <iostream>
+
+#include "IniSection.hpp"
+#include "IniStringHelper.hpp"
 
 using namespace std;
 
@@ -36,8 +39,18 @@ namespace simpleIniParser {
         options.clear();
     }
 
-    IniOption * IniSection::findFirstOption(string key) {
-        auto it = find_if(options.begin(), options.end(), [&key](const IniOption * obj) { return obj->key == key; });
+    IniOption * IniSection::findFirstOption(string key, bool caseSensitive) {
+        if (!caseSensitive) {
+            IniStringHelper::toupper(key);
+        }
+
+        auto it = find_if(options.begin(), options.end(), [&key, &caseSensitive](const IniOption * obj) {
+            if (!caseSensitive) {
+                return IniStringHelper::toupper_copy(obj->key) == key;
+            }
+
+            return obj->key == key;
+        });
         if (it == options.end())
             return nullptr;
 

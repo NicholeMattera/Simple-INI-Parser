@@ -39,7 +39,7 @@ namespace simpleIniParser {
 
             IniSection(IniSectionType type, std::string value);
             ~IniSection();
-            IniOption * findFirstOption(std::string key);
+            IniOption * findFirstOption(std::string key, bool caseSensitive = true);
             std::string build();
             static IniSection * parse(std::string line);
     };
