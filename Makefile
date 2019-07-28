@@ -114,18 +114,6 @@ lib/lib$(TARGET)d.a : lib debug $(SOURCES) $(INCLUDES)
 	--no-print-directory -C debug \
 	-f $(CURDIR)/Makefile
 
-dist-bin: all
-	@tar --exclude=*~ -cjf lib$(TARGET)-$(VERSION).tar.bz2 include lib LICENSE
-
-dist-src:
-	@tar --exclude=*~ -cjf lib$(TARGET)-src-$(VERSION).tar.bz2 example include source LICENSE Makefile README.md
-
-dist: dist-src dist-bin
-
-install: dist-bin
-	mkdir -p $(DESTDIR)$(PORTLIBS)
-	bzip2 -cd lib$(TARGET)-$(VERSION).tar.bz2 | tar -xf - -C $(DESTDIR)$(PORTLIBS)
-
 #---------------------------------------------------------------------------------
 clean:
 	@echo clean ...
