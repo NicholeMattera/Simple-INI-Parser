@@ -4,18 +4,7 @@ A library for the Nintendo Switch to be able to easily parse, modify, and create
 
 ## Installation
 
-To install the latest release run the following:
-
-```bash
-makepkg -si
-```
-
-To build from source run the following:
-
-```bash
-make
-sudo make install
-```
+I recommend adding this as a git submodule to your and then modifying your makefile to look in this directory for libs. For examples on how to do this please look at [Kosmos Updater](https://github.com/AtlasNX/Kosmos-Updater), and [ReiNX Spoofer](https://github.com/StevenMattera/ReiNX-Spoofer).
 
 ## Usage
 
