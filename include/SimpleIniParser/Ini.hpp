@@ -1,6 +1,6 @@
 /*
  * SimpleIniParser
- * Copyright (c) 2019 Steven Mattera
+ * Copyright (c) 2019 Nichole Mattera
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above 
@@ -21,14 +21,17 @@
 #include <string>
 
 #include "IniSection.hpp"
+#include "IniOption.hpp"
 
 namespace simpleIniParser {
     class Ini {
         public:
+            std::vector<IniOption *> options;
             std::vector<IniSection *> sections;
 
             ~Ini();
             std::string build();
+            IniOption * findFirstOption(std::string key, bool caseSensitive = true);
             IniSection * findSection(std::string name, bool caseSensitive = true);
             bool writeToFile(std::string path);
             static Ini * parseFile(std::string path);

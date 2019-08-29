@@ -1,6 +1,6 @@
 /*
  * SimpleIniParser
- * Copyright (c) 2019 Steven Mattera
+ * Copyright (c) 2019 Nichole Mattera
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above 
@@ -21,21 +21,37 @@
 using namespace std;
 
 namespace simpleIniParser {
-    IniOption::IniOption(string name, string val) {
-        key = name;
-        value = val;
+    IniOption::IniOption(IniOptionType t, string k, string v) {
+        type = t;
+        key = k;
+        value = v;
     }
 
     string IniOption::build() {
-        return key + '=' + value;
+        switch (type) {
+            case IniOptionType::SemicolonComment:
+                return "; " + value + "\n";
+
+            case IniOptionType::HashtagComment:
+                return "# " + value + "\n";
+
+            default:
+                return key + "=" + value + "\n";
+        }
     }
 
     IniOption * IniOption::parse(string line) {
-        size_t pos = line.find('=');
-        if (pos != string::npos && pos > 0) {
-            return new IniOption(IniStringHelper::rtrim_copy(line.substr(0, pos)), IniStringHelper::ltrim_copy(line.substr(pos + 1)));
+        if (line.at(0) == ';') {
+            return new IniOption(IniOptionType::SemicolonComment, "", IniStringHelper::trim_copy(line.substr(1, line.size() - 1)));
+        } else if (line.at(0) == '#') {
+            return new IniOption(IniOptionType::HashtagComment, "", IniStringHelper::trim_copy(line.substr(1, line.size() - 1)));
         } else {
-            return nullptr;
+            size_t pos = line.find('=');
+            if (pos != string::npos && pos > 0) {
+                return new IniOption(IniOptionType::Option, IniStringHelper::rtrim_copy(line.substr(0, pos)), IniStringHelper::ltrim_copy(line.substr(pos + 1)));
+            } else {
+                return nullptr;
+            }
         }
     }
 }

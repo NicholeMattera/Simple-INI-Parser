@@ -1,6 +1,6 @@
 /*
  * SimpleIniParser
- * Copyright (c) 2019 Steven Mattera
+ * Copyright (c) 2019 Nichole Mattera
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above 
@@ -23,13 +23,12 @@
 #include "IniOption.hpp"
 
 namespace simpleIniParser {
-    typedef enum {
-        SECTION,
-        SEMICOLON_COMMENT,
-        HASHTAG_COMMENT,
-        HEKATE_CAPTION,
-        BLANK_LINE
-    } IniSectionType;
+    enum class IniSectionType {
+        Section,
+        SemicolonComment,
+        HashtagComment,
+        HekateCaption,
+    };
 
     class IniSection {
         public:
@@ -41,6 +40,6 @@ namespace simpleIniParser {
             ~IniSection();
             IniOption * findFirstOption(std::string key, bool caseSensitive = true);
             std::string build();
-            static IniSection * parse(std::string line);
+            static IniSection * parse(std::string line, bool parseComments);
     };
 }

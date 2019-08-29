@@ -1,6 +1,6 @@
 /*
  * SimpleIniParser
- * Copyright (c) 2019 Steven Mattera
+ * Copyright (c) 2019 Nichole Mattera
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above 
@@ -20,12 +20,19 @@
 #include <string>
 
 namespace simpleIniParser {
+    enum class IniOptionType {
+        Option,
+        SemicolonComment,
+        HashtagComment,
+    };
+
     class IniOption {
         public:
+            IniOptionType type;
             std::string key;
             std::string value;
 
-            IniOption(std::string name, std::string val);
+            IniOption(IniOptionType type, std::string key, std::string val);
             std::string build();
             static IniOption * parse(std::string line);
     };

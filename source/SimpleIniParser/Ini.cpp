@@ -1,6 +1,6 @@
 /*
  * SimpleIniParser
- * Copyright (c) 2019 Steven Mattera
+ * Copyright (c) 2019 Nichole Mattera
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above 
@@ -18,6 +18,7 @@
 #include <algorithm> 
 #include <fstream>
 #include <iostream>
+#include <switch.h>
 
 #include "Ini.hpp"
 #include "IniOption.hpp"
@@ -39,11 +40,33 @@ namespace simpleIniParser {
     string Ini::build() {
         string result;
 
-        for (IniSection * section : sections) {
-            result += section->build() + "\n";
+        for (auto const& option : options) {
+            result += option->build();
+        }
+
+        for (auto const& section : sections) {
+            result += section->build();
         }
 
         return result;
+    }
+
+    IniOption * Ini::findFirstOption(string key, bool caseSensitive) {
+        if (!caseSensitive) {
+            IniStringHelper::toupper(key);
+        }
+
+        auto it = find_if(options.begin(), options.end(), [&key, &caseSensitive](const IniOption * obj) {
+            if (!caseSensitive) {
+                return IniStringHelper::toupper_copy(obj->key) == key;
+            }
+
+            return obj->key == key;
+        });
+        if (it == options.end())
+            return nullptr;
+
+        return (*it);
     }
 
     IniSection * Ini::findSection(string name, bool caseSensitive) {
@@ -74,6 +97,8 @@ namespace simpleIniParser {
         file.flush();
         file.close();
 
+        fsdevCommitDevice("sdmc");
+
         return true;
     }
 
@@ -90,15 +115,18 @@ namespace simpleIniParser {
             if (line.size() == 0)
                 continue;
 
-            IniSection * section = IniSection::parse(line);
+            bool shouldParseCommentsAsSection = ini->sections.size() != 0 && ini->sections.back()->type != IniSectionType::Section;
+            IniSection * section = IniSection::parse(line, shouldParseCommentsAsSection);
             if (section != nullptr) {
                 ini->sections.push_back(section);
-            }
-            else if (ini->sections.size() != 0 && ini->sections.back()->type == SECTION) {
+            } else {
                 IniOption * option = IniOption::parse(line);
 
-                if (option != nullptr)
+                if (option != nullptr && ini->sections.size() == 0) {
+                    ini->options.push_back(option);
+                } else if (option != nullptr && ini->sections.size() != 0 && ini->sections.back()->type == IniSectionType::Section) {
                     ini->sections.back()->options.push_back(option);
+                }
             }
         }
 

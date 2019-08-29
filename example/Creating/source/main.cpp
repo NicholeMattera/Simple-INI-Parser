@@ -1,6 +1,6 @@
 /*
  * SimpleIniParser
- * Copyright (c) 2019 Steven Mattera
+ * Copyright (c) 2019 Nichole Mattera
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above 
@@ -28,31 +28,31 @@ int main(int argc, char **argv) {
 
     Ini * hekateIni = new Ini();
 
-    IniSection * configSection = new IniSection(SECTION, "config");
-    configSection->options.push_back(new IniOption("autoboot", "1"));
-    configSection->options.push_back(new IniOption("autoboot_list", "0"));
-    configSection->options.push_back(new IniOption("bootwait", "5"));
-    configSection->options.push_back(new IniOption("customlogo", "1"));
-    configSection->options.push_back(new IniOption("verification", "1"));
-    configSection->options.push_back(new IniOption("backlight", "100"));
-    configSection->options.push_back(new IniOption("autohosoff", "0"));
-    configSection->options.push_back(new IniOption("autonogc", "1"));
+    IniSection * configSection = new IniSection(IniSectionType::Section, "config");
+    configSection->options.push_back(new IniOption(IniOptionType::Option, "autoboot", "1"));
+    configSection->options.push_back(new IniOption(IniOptionType::Option, "autoboot_list", "0"));
+    configSection->options.push_back(new IniOption(IniOptionType::Option, "bootwait", "5"));
+    configSection->options.push_back(new IniOption(IniOptionType::Option, "customlogo", "1"));
+    configSection->options.push_back(new IniOption(IniOptionType::Option, "verification", "1"));
+    configSection->options.push_back(new IniOption(IniOptionType::Option, "backlight", "100"));
+    configSection->options.push_back(new IniOption(IniOptionType::Option, "autohosoff", "0"));
+    configSection->options.push_back(new IniOption(IniOptionType::Option, "autonogc", "1"));
     hekateIni->sections.push_back(configSection);
 
-    hekateIni->sections.push_back(new IniSection(HEKATE_CAPTION, "CFW"));
+    hekateIni->sections.push_back(new IniSection(IniSectionType::HekateCaption, "CFW"));
 
-    IniSection * cfwSection = new IniSection(SECTION, "CFW");
-    cfwSection->options.push_back(new IniOption("fss0", "atmosphere/fusee-secondary.bin"));
-    cfwSection->options.push_back(new IniOption("kip1patch", "nosigchk"));
-    cfwSection->options.push_back(new IniOption("atmosphere", "1"));
-    cfwSection->options.push_back(new IniOption("logopath", "bootloader/bootlogo.bmp"));
+    IniSection * cfwSection = new IniSection(IniSectionType::Section, "CFW");
+    cfwSection->options.push_back(new IniOption(IniOptionType::Option, "fss0", "atmosphere/fusee-secondary.bin"));
+    cfwSection->options.push_back(new IniOption(IniOptionType::Option, "kip1patch", "nosigchk"));
+    cfwSection->options.push_back(new IniOption(IniOptionType::Option, "atmosphere", "1"));
+    cfwSection->options.push_back(new IniOption(IniOptionType::Option, "logopath", "bootloader/bootlogo.bmp"));
     hekateIni->sections.push_back(cfwSection);
 
-    hekateIni->sections.push_back(new IniSection(HEKATE_CAPTION, "Stock"));
+    hekateIni->sections.push_back(new IniSection(IniSectionType::HekateCaption, "Stock"));
 
-    IniSection * stockSection = new IniSection(SECTION, "Stock");
-    stockSection->options.push_back(new IniOption("fss0", "atmosphere/fusee-secondary.bin"));
-    stockSection->options.push_back(new IniOption("stock", "1"));
+    IniSection * stockSection = new IniSection(IniSectionType::Section, "Stock");
+    stockSection->options.push_back(new IniOption(IniOptionType::Option, "fss0", "atmosphere/fusee-secondary.bin"));
+    stockSection->options.push_back(new IniOption(IniOptionType::Option, "stock", "1"));
     hekateIni->sections.push_back(stockSection);
 
     if (hekateIni->writeToFile("sdmc:/example.ini")) {

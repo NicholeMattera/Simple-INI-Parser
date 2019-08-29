@@ -1,6 +1,6 @@
 /*
  * SimpleIniParser
- * Copyright (c) 2019 Steven Mattera
+ * Copyright (c) 2019 Nichole Mattera
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above 
@@ -23,6 +23,48 @@
 using namespace simpleIniParser;
 using namespace std;
 
+void writeOption(IniOption * option, bool withTab) {
+    switch (option->type) {
+        case IniOptionType::SemicolonComment:
+            cout << ((withTab) ? "\t" : "") << "Type: Semicolon Comment, Value: \"" << option->value << "\"\n";
+            break;
+
+        case IniOptionType::HashtagComment:
+            cout << ((withTab) ? "\t" : "") << "Type: Hashtag Comment, Value: \"" << option->value << "\"\n";
+            break;
+
+        default:
+            cout << ((withTab) ? "\t" : "") << "Type: Option, Key: \"" << option->key << "\", Value: \"" << option->value << "\"\n";
+            break;
+    }
+}
+
+void writeSection(IniSection * section) {
+    switch (section->type) {
+        case IniSectionType::SemicolonComment:
+            cout << "Type: Semicolon Comment, Value: \"" << section->value << "\"\n";
+            break;
+
+        case IniSectionType::HashtagComment:
+            cout << "Type: Hashtag Comment, Value: \"" << section->value << "\"\n";
+            break;
+
+        case IniSectionType::HekateCaption:
+            cout << "Type: Hekate Caption, Value: \"" << section->value << "\"\n";
+            break;
+
+        default:
+            cout << "Type: Section, Value: \"" << section->value << "\"\n";
+            break;
+    }
+
+    for (auto const& option : section->options) {
+        writeOption(option, true);
+    }
+
+    cout << "\n";
+}
+
 int main(int argc, char **argv) {
     consoleInit(NULL);
 
@@ -31,50 +73,29 @@ int main(int argc, char **argv) {
         cout << "Unable to initialize romfs.\n";
     }
     else {
-        Ini * hekateIni = Ini::parseFile("romfs:/hekate_ipl.ini");
+        Ini * config = Ini::parseFile("romfs:/config.ini");
 
         cout << "Reading through an INI file.\n";
         cout << "=====================================================\n\n";
 
-        for (auto const& section : hekateIni->sections) {
-            switch (section->type) {
-                case SECTION:
-                    cout << "Type: Section | Value: \"" << section->value << "\"\n";
-                    cout << "-----------------------------------------------------\n";
-                    break;
 
-                case SEMICOLON_COMMENT:
-                    cout << "Type: Semicolon Comment | Value: \"" << section->value << "\"\n";
-                    cout << "-----------------------------------------------------\n";
-                    break;
-
-                case HASHTAG_COMMENT:
-                    cout << "Type: Hashtag Comment | Value: \"" << section->value << "\"\n";
-                    cout << "-----------------------------------------------------\n";
-                    break;
-
-                case HEKATE_CAPTION:
-                    cout << "Type: Hekate Caption | Value: \"" << section->value << "\"\n";
-                    cout << "-----------------------------------------------------\n";
-                    break;
-
-                default:
-                    break;
-            }
-
-            for (auto const& option : section->options) {
-                cout << "Key: \"" << option->key << "\" | Value: \"" << option->value << "\"\n";
-            }
-            
+        for (auto const& option : config->options) {
+            writeOption(option, false);
+        }
+        
+        if (config->options.size() > 0)
             cout << "\n";
+
+        for (auto const& section : config->sections) {
+            writeSection(section);
         }
 
         cout << "\nGet a specific option from a specific section.\n";
         cout << "=====================================================\n\n";
-        IniOption * option = hekateIni->findSection("config")->findFirstOption("aUtOnOgC", false);
+        IniOption * option = config->findSection("config")->findFirstOption("cUsToMlOgO", false);
         cout << "Key: \"" << option->key << "\" | Value: \"" << option->value << "\"\n\n";
 
-        delete hekateIni;
+        delete config;
     }
 
     cout << "\nPress any key to close.\n";

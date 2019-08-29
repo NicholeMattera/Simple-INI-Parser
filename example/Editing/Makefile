@@ -44,6 +44,10 @@ DATA		:=	data
 INCLUDES	:=	include
 ROMFS		:=	romfs
 
+APP_TITLE	:= SimpleIniParser Editing Example
+APP_AUTHOR	:= Nichole Mattera
+APP_VERSION	:= 2.0.0
+
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
@@ -60,6 +64,11 @@ ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
 
 LIBS	:= -lSimpleIniParser -lnx
+
+ifneq (,$(shell which ccache))
+	CXX		:=	$(shell which ccache) $(CXX)
+	CC		:=	$(shell which ccache) $(CC)
+endif
 
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing

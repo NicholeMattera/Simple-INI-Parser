@@ -1,6 +1,6 @@
 /*
  * SimpleIniParser
- * Copyright (c) 2019 Steven Mattera
+ * Copyright (c) 2019 Nichole Mattera
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above 
@@ -33,7 +33,7 @@ int main(int argc, char **argv) {
         cout << "Unable to initialize romfs.\n";
     }
     else {
-        copy_file("romfs:/hekate_ipl.ini", "sdmc:/example1.ini");
+        copy_file("romfs:/config.ini", "sdmc:/example1.ini");
 
         Ini * exampleIni = Ini::parseFile("sdmc:/example1.ini");
         exampleIni->sections.pop_back();

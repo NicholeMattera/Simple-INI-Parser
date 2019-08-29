@@ -1,6 +1,6 @@
 /*
  * SimpleIniParser
- * Copyright (c) 2019 Steven Mattera
+ * Copyright (c) 2019 Nichole Mattera
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above 
@@ -58,38 +58,36 @@ namespace simpleIniParser {
     }
 
     string IniSection::build() {
-        if (type == HEKATE_CAPTION)
-            return "{" + value + "}\n";
-            
-        if (type == SEMICOLON_COMMENT)
-            return ";" + value + "\n";
-            
-        if (type == HASHTAG_COMMENT)
-            return "#" + value + "\n";
+        switch (type) {
+            case IniSectionType::HekateCaption:
+                return "\n{" + value + "}\n";
 
-        if (type == BLANK_LINE)
-            return "\n";
+            case IniSectionType::SemicolonComment:
+                return "\n; " + value + "\n";
 
-        string result = "[" + value + "]\n";
+            case IniSectionType::HashtagComment:
+                return "\n# " + value + "\n";
 
-        for (IniOption * option : options) {
-            result += option->build() + "\n";
+            default:
+                string result = "\n[" + value + "]\n";
+
+                for (auto const& option : options) {
+                    result += option->build();
+                }
+
+                return result;
         }
-
-        return result;
     }
 
-    IniSection * IniSection::parse(string line) {
+    IniSection * IniSection::parse(string line, bool parseComments) {
         if (line.at(0) == '{' && line.at(line.size() - 1) == '}') {
-            return new IniSection(HEKATE_CAPTION, line.substr(1, line.size() - 2));
-        } else if (line.at(0) == ';') {
-            return new IniSection(SEMICOLON_COMMENT, line.substr(1, line.size() - 1));
-        } else if (line.at(0) == '#') {
-            return new IniSection(HASHTAG_COMMENT, line.substr(1, line.size() - 1));
+            return new IniSection(IniSectionType::HekateCaption, IniStringHelper::trim_copy(line.substr(1, line.size() - 2)));
+        } else if (parseComments && line.at(0) == ';') {
+            return new IniSection(IniSectionType::SemicolonComment, IniStringHelper::trim_copy(line.substr(1, line.size() - 1)));
+        } else if (parseComments && line.at(0) == '#') {
+            return new IniSection(IniSectionType::HashtagComment, IniStringHelper::trim_copy(line.substr(1, line.size() - 1)));
         } else if (line.at(0) == '[' && line.at(line.size() - 1) == ']') {
-            return new IniSection(SECTION, line.substr(1, line.size() - 2));
-        } else if (line.size() == 0) {
-            return new IniSection(BLANK_LINE, "");
+            return new IniSection(IniSectionType::Section, IniStringHelper::trim_copy(line.substr(1, line.size() - 2)));
         } else {
             return nullptr;
         }
