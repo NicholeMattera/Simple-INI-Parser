@@ -18,6 +18,7 @@
 #pragma once
 
 #include <vector>
+#include <sstream>
 #include <string>
 
 #include "IniSection.hpp"
@@ -28,6 +29,7 @@ namespace simpleIniParser {
         public:
             std::vector<IniOption *> options;
             std::vector<IniSection *> sections;
+            std::string magic;
 
             ~Ini();
             std::string build();
@@ -35,5 +37,9 @@ namespace simpleIniParser {
             IniSection * findSection(std::string name, bool caseSensitive = true);
             bool writeToFile(std::string path);
             static Ini * parseFile(std::string path);
+            static Ini * parseFileWithMagic(std::string path, std::string magic);
+
+        private:
+            static Ini * _parseContent(std::stringstream * content, std::string magic);
     };
 }

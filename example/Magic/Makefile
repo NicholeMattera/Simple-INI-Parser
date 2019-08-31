@@ -43,7 +43,7 @@ SOURCES		:=	source
 DATA		:=	data
 INCLUDES	:=	include
 
-APP_TITLE	:= SimpleIniParser Creating Example
+APP_TITLE	:= SimpleIniParser Magic Example
 APP_AUTHOR	:= Nichole Mattera
 APP_VERSION	:= 2.0.1
 

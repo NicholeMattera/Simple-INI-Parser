@@ -46,7 +46,7 @@ ROMFS		:=	romfs
 
 APP_TITLE	:= SimpleIniParser Editing Example
 APP_AUTHOR	:= Nichole Mattera
-APP_VERSION	:= 2.0.0
+APP_VERSION	:= 2.0.1
 
 #---------------------------------------------------------------------------------
 # options for code generation

@@ -18,6 +18,7 @@
 #include <algorithm> 
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <switch.h>
 
 #include "Ini.hpp"
@@ -28,6 +29,8 @@ using namespace std;
 
 namespace simpleIniParser {
     Ini::~Ini() {
+        magic = "";
+
         for (IniSection * section : sections) {
             if (section != nullptr) {
                 delete section;
@@ -39,6 +42,10 @@ namespace simpleIniParser {
 
     string Ini::build() {
         string result;
+
+        if (magic != "") {
+            result += magic + "\n";
+        }
 
         for (auto const& option : options) {
             result += option->build();
@@ -107,9 +114,37 @@ namespace simpleIniParser {
         if (!file.is_open())
             return nullptr;
 
-        Ini * ini = new Ini();
+        stringstream buffer;
+        buffer << file.rdbuf();
+        file.close();
+
+        return _parseContent(&buffer, "");
+    }
+    
+    Ini * Ini::parseFileWithMagic(string path, string magic) {
+        ifstream file(path);
+        if (!file.is_open())
+            return nullptr;
+
+        stringstream buffer;
+        buffer << file.rdbuf();
+        file.close();
+
         string line;
-        while (getline(file, line)) {
+        getline(buffer, line);
+        IniStringHelper::trim(line);
+        if (line != magic) {
+            return nullptr;
+        }
+        
+        return _parseContent(&buffer, magic);
+    }
+
+    Ini * Ini::_parseContent(stringstream * content, string magic) {
+        Ini * ini = new Ini();
+        ini->magic = magic;
+        string line;
+        while (getline(* content, line)) {
             IniStringHelper::trim(line);
 
             if (line.size() == 0)
@@ -129,8 +164,6 @@ namespace simpleIniParser {
                 }
             }
         }
-
-        file.close();
 
         return ini;
     }
