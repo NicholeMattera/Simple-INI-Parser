@@ -33,8 +33,8 @@ namespace simpleIniParser {
 
             ~Ini();
             std::string build();
-            IniOption * findFirstOption(std::string key, bool caseSensitive = true);
-            IniSection * findSection(std::string name, bool caseSensitive = true);
+            IniOption * findFirstOption(std::string term, bool caseSensitive = true, IniOptionType type = IniOptionType::Any, IniOptionSearchField field = IniOptionSearchField::Key);
+            IniSection * findSection(std::string term, bool caseSensitive = true, IniSectionType type = IniSectionType::Any);
             bool writeToFile(std::string path);
             static Ini * parseFile(std::string path);
             static Ini * parseFileWithMagic(std::string path, std::string magic);

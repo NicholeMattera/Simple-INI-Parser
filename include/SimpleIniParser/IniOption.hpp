@@ -21,9 +21,15 @@
 
 namespace simpleIniParser {
     enum class IniOptionType {
+        Any,
         Option,
         SemicolonComment,
         HashtagComment,
+    };
+
+    enum class IniOptionSearchField {
+        Key,
+        Value
     };
 
     class IniOption {

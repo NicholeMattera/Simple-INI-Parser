@@ -24,6 +24,7 @@
 
 namespace simpleIniParser {
     enum class IniSectionType {
+        Any,
         Section,
         SemicolonComment,
         HashtagComment,
@@ -38,7 +39,7 @@ namespace simpleIniParser {
 
             IniSection(IniSectionType type, std::string value);
             ~IniSection();
-            IniOption * findFirstOption(std::string key, bool caseSensitive = true);
+            IniOption * findFirstOption(std::string key, bool caseSensitive = true, IniOptionType type = IniOptionType::Any, IniOptionSearchField field = IniOptionSearchField::Key);
             std::string build();
             static IniSection * parse(std::string line, bool parseComments);
     };

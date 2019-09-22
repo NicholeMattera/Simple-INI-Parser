@@ -39,18 +39,26 @@ namespace simpleIniParser {
         options.clear();
     }
 
-    IniOption * IniSection::findFirstOption(string key, bool caseSensitive) {
+    IniOption * IniSection::findFirstOption(string term, bool caseSensitive, IniOptionType type, IniOptionSearchField field) {
         if (!caseSensitive) {
-            IniStringHelper::toupper(key);
+            IniStringHelper::toupper(term);
         }
 
-        auto it = find_if(options.begin(), options.end(), [&key, &caseSensitive](const IniOption * obj) {
-            if (!caseSensitive) {
-                return IniStringHelper::toupper_copy(obj->key) == key;
+        auto it = find_if(options.begin(), options.end(), [&term, &caseSensitive, &type, &field](const IniOption * obj) {
+            if (type != IniOptionType::Any && type != obj->type) {
+                return false;
             }
 
-            return obj->key == key;
+            string fieldValue = "";
+            if (field == IniOptionSearchField::Key) {
+                fieldValue = (!caseSensitive) ? IniStringHelper::toupper_copy(obj->key) : obj->key;
+            } else {
+                fieldValue = (!caseSensitive) ? IniStringHelper::toupper_copy(obj->value) : obj->value;
+            }
+
+            return fieldValue == term;
         });
+
         if (it == options.end())
             return nullptr;
 

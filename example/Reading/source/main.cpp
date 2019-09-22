@@ -93,7 +93,10 @@ int main(int argc, char **argv) {
         cout << "\nGet a specific option from a specific section.\n";
         cout << "=====================================================\n\n";
         IniOption * option = config->findSection("config")->findFirstOption("cUsToMlOgO", false);
-        cout << "Key: \"" << option->key << "\" | Value: \"" << option->value << "\"\n\n";
+        cout << "Key: \"" << option->key << "\" | Value: \"" << option->value << "\"\n";
+
+        IniOption * option2 = config->findSection("CFW", true, IniSectionType::Section)->findFirstOption("option comment test", false, IniOptionType::HashtagComment, IniOptionSearchField::Value);
+        cout << "Key: \"" << option2->key << "\" | Value: \"" << option2->value << "\"\n\n";
 
         delete config;
     }
