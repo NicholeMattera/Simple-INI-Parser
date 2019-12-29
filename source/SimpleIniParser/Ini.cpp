@@ -84,6 +84,18 @@ namespace simpleIniParser {
         return (*it);
     }
 
+
+    IniOption * Ini::findOrCreateFirstOption(string key, string val, bool caseSensitive, IniOptionType type, IniOptionSearchField field) {
+        auto it = findFirstOption(key, caseSensitive, type, field);
+        if (it == nullptr)
+        {
+            it = new IniOption(type, key, val);
+            options.push_back(it);
+        }
+
+        return it;
+    }
+
     IniSection * Ini::findSection(string term, bool caseSensitive, IniSectionType type) {
         if (!caseSensitive) {
             IniStringHelper::toupper(term);
@@ -102,6 +114,17 @@ namespace simpleIniParser {
             return nullptr;
 
         return (*it);
+    }
+
+    IniSection * Ini::findOrCreateSection(string term, bool caseSensitive, IniSectionType type) {
+        auto it = findSection(term, caseSensitive, type);
+        if (it == nullptr)
+        {
+            it = new IniSection(type, term);
+            sections.push_back(it);
+        }
+
+        return it;
     }
 
     bool Ini::writeToFile(string path) {
@@ -148,6 +171,13 @@ namespace simpleIniParser {
         }
         
         return _parseContent(&buffer, magic);
+    }
+
+    Ini * Ini::parseOrCreateFile(string path, string magic) {
+        auto it = Ini::parseFileWithMagic(path, magic);
+        if (it == nullptr)
+            it = new Ini();
+        return it;
     }
 
     Ini * Ini::_parseContent(stringstream * content, string magic) {

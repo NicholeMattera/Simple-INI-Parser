@@ -65,6 +65,17 @@ namespace simpleIniParser {
         return (*it);
     }
 
+    IniOption * IniSection::findOrCreateFirstOption(string key, string val, bool caseSensitive, IniOptionType type, IniOptionSearchField field) {
+        auto it = findFirstOption(key, caseSensitive, type, field);
+        if (it == nullptr)
+        {
+            it = new IniOption(type, key, val);
+            options.push_back(it);
+        }
+
+        return it;
+    }
+
     string IniSection::build() {
         switch (type) {
             case IniSectionType::HekateCaption:
