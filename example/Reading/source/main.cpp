@@ -19,6 +19,7 @@
 #include <fstream>
 #include <switch.h>
 #include <SimpleIniParser.hpp>
+#include <vector>
 
 using namespace simpleIniParser;
 
@@ -91,6 +92,11 @@ int main(int argc, char **argv) {
 
         std::cout << "\nGet a specific option from a specific section.\n";
         std::cout << "=====================================================\n\n";
+
+        std::vector<IniOption *> options = config->findSection("CFW", true, IniSectionType::Section)->findAllOptions("logopath");
+        for (auto const& option : options) {
+            writeOption(option, false);
+        }
 
         IniOption * option = config->findSection("config")->findFirstOption("cUsToMlOgO", false);
         std::cout << "Key: \"" << option->key << "\" | Value: \"" << option->value << "\"\n";

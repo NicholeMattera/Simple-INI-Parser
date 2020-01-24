@@ -16,6 +16,7 @@
  */
 
 #include <algorithm>
+#include <functional>
 #include <iostream>
 
 #include "IniSection.hpp"
@@ -70,6 +71,30 @@ namespace simpleIniParser {
         }
 
         return it;
+    }
+
+    std::vector<IniOption *> IniSection::findAllOptions(std::string term, bool caseSensitive, IniOptionType type, IniOptionSearchField field) {
+        std::vector<IniOption *> results;
+
+        if (!caseSensitive) {
+            IniStringHelper::toupper(term);
+        }
+
+        std::copy_if(
+            options.begin(),
+            options.end(),
+            std::back_inserter(results),
+            std::bind(
+                _findElements,
+                std::placeholders::_1,
+                term,
+                caseSensitive,
+                type,
+                field
+            )
+        );
+
+        return results;
     }
 
     std::string IniSection::build() {
