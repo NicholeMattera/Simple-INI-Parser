@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include <vector>
 #include <sstream>
 #include <string>
+#include <vector>
 
 #include "IniSection.hpp"
 #include "IniOption.hpp"
@@ -35,8 +35,10 @@ namespace simpleIniParser {
             std::string build();
             IniOption * findFirstOption(std::string term, bool caseSensitive = true, IniOptionType type = IniOptionType::Any, IniOptionSearchField field = IniOptionSearchField::Key);
             IniOption * findOrCreateFirstOption(std::string key, std::string val, bool caseSensitive = true, IniOptionType type = IniOptionType::Any, IniOptionSearchField field = IniOptionSearchField::Key);
+            std::vector<IniOption *> findAllOptions(std::string term, bool caseSensitive = true, IniOptionType type = IniOptionType::Any, IniOptionSearchField field = IniOptionSearchField::Key);
             IniSection * findSection(std::string term, bool caseSensitive = true, IniSectionType type = IniSectionType::Any);
             IniSection * findOrCreateSection(std::string term, bool caseSensitive = true, IniSectionType type = IniSectionType::Any);
+            std::vector<IniSection *> findAllSections(std::string term, bool caseSensitive = true, IniSectionType type = IniSectionType::Any);
             bool writeToFile(std::string path);
             static Ini * parseFile(std::string path);
             static Ini * parseFileWithMagic(std::string path, std::string magic);
@@ -44,5 +46,6 @@ namespace simpleIniParser {
 
         private:
             static Ini * _parseContent(std::stringstream * content, std::string magic);
+        
     };
 }

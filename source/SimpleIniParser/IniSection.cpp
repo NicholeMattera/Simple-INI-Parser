@@ -19,6 +19,7 @@
 #include <functional>
 #include <iostream>
 
+#include "IniHelper.hpp"
 #include "IniSection.hpp"
 #include "IniStringHelper.hpp"
 
@@ -47,7 +48,7 @@ namespace simpleIniParser {
             options.begin(),
             options.end(),
             std::bind(
-                _findElements,
+                IniHelper::findOption,
                 std::placeholders::_1,
                 term,
                 caseSensitive,
@@ -85,7 +86,7 @@ namespace simpleIniParser {
             options.end(),
             std::back_inserter(results),
             std::bind(
-                _findElements,
+                IniHelper::findOption,
                 std::placeholders::_1,
                 term,
                 caseSensitive,
@@ -131,20 +132,5 @@ namespace simpleIniParser {
         } else {
             return nullptr;
         }
-    }
-
-    bool IniSection::_findElements(const IniOption * obj, std::string term, bool caseSensitive, IniOptionType type, IniOptionSearchField field) {
-        if (type != IniOptionType::Any && type != obj->type) {
-            return false;
-        }
-        
-        std::string fieldValue = "";
-        if (field == IniOptionSearchField::Key) {
-            fieldValue = (!caseSensitive) ? IniStringHelper::toupper_copy(obj->key) : obj->key;
-        } else {
-            fieldValue = (!caseSensitive) ? IniStringHelper::toupper_copy(obj->value) : obj->value;
-        }
-
-        return fieldValue == term;
     }
 }

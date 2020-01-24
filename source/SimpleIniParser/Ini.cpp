@@ -17,11 +17,13 @@
 
 #include <algorithm> 
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <sstream>
 #include <switch.h>
 
 #include "Ini.hpp"
+#include "IniHelper.hpp"
 #include "IniOption.hpp"
 #include "IniStringHelper.hpp"
 
@@ -61,20 +63,18 @@ namespace simpleIniParser {
             IniStringHelper::toupper(term);
         }
 
-        auto it = find_if(options.begin(), options.end(), [&term, &caseSensitive, &type, &field](const IniOption * obj) {
-            if (type != IniOptionType::Any && type != obj->type) {
-                return false;
-            }
-
-            std::string fieldValue = "";
-            if (field == IniOptionSearchField::Key) {
-                fieldValue = (!caseSensitive) ? IniStringHelper::toupper_copy(obj->key) : obj->key;
-            } else {
-                fieldValue = (!caseSensitive) ? IniStringHelper::toupper_copy(obj->value) : obj->value;
-            }
-
-            return fieldValue == term;
-        });
+        auto it = std::find_if(
+            options.begin(),
+            options.end(),
+            std::bind(
+                IniHelper::findOption,
+                std::placeholders::_1,
+                term,
+                caseSensitive,
+                type,
+                field
+            )
+        );
 
         if (it == options.end())
             return nullptr;
@@ -94,19 +94,46 @@ namespace simpleIniParser {
         return it;
     }
 
+    std::vector<IniOption *> Ini::findAllOptions(std::string term, bool caseSensitive, IniOptionType type, IniOptionSearchField field) {
+        std::vector<IniOption *> results;
+
+        if (!caseSensitive) {
+            IniStringHelper::toupper(term);
+        }
+
+        std::copy_if(
+            options.begin(),
+            options.end(),
+            std::back_inserter(results),
+            std::bind(
+                IniHelper::findOption,
+                std::placeholders::_1,
+                term,
+                caseSensitive,
+                type,
+                field
+            )
+        );
+
+        return results;
+    }
+
     IniSection * Ini::findSection(std::string term, bool caseSensitive, IniSectionType type) {
         if (!caseSensitive) {
             IniStringHelper::toupper(term);
         }
 
-        auto it = find_if(sections.begin(), sections.end(), [&term, &caseSensitive, &type](const IniSection * obj) {
-            if (type != IniSectionType::Any && type != obj->type) {
-                return false;
-            }
-
-            std::string fieldValue = (!caseSensitive) ? IniStringHelper::toupper_copy(obj->value) : obj->value;
-            return fieldValue == term;
-        });
+        auto it = std::find_if(
+            sections.begin(),
+            sections.end(),
+            std::bind(
+                IniHelper::findSection,
+                std::placeholders::_1,
+                term,
+                caseSensitive,
+                type
+            )
+        );
 
         if (it == sections.end())
             return nullptr;
@@ -123,6 +150,29 @@ namespace simpleIniParser {
         }
 
         return it;
+    }
+
+    std::vector<IniSection *> Ini::findAllSections(std::string term, bool caseSensitive, IniSectionType type) {
+        std::vector<IniSection *> results;
+
+        if (!caseSensitive) {
+            IniStringHelper::toupper(term);
+        }
+
+        std::copy_if(
+            sections.begin(),
+            sections.end(),
+            std::back_inserter(results),
+            std::bind(
+                IniHelper::findSection,
+                std::placeholders::_1,
+                term,
+                caseSensitive,
+                type
+            )
+        );
+
+        return results;
     }
 
     bool Ini::writeToFile(std::string path) {

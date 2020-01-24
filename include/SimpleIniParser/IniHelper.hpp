@@ -15,8 +15,18 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include "SimpleIniParser/Ini.hpp"
-#include "SimpleIniParser/IniHelper.hpp"
-#include "SimpleIniParser/IniSection.hpp"
-#include "SimpleIniParser/IniOption.hpp"
-#include "SimpleIniParser/IniStringHelper.hpp"
+#pragma once
+
+#include <string>
+
+#include "IniOption.hpp"
+#include "IniSection.hpp"
+
+namespace simpleIniParser {
+    class IniHelper {
+        public:
+            static bool findOption(const IniOption * obj, std::string term, bool caseSensitive, IniOptionType type, IniOptionSearchField field);
+            static bool findSection(const IniSection * obj, std::string term, bool caseSensitive, IniSectionType type);
+
+    };
+}
