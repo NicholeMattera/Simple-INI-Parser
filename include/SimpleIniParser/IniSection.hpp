@@ -39,9 +39,12 @@ namespace simpleIniParser {
 
             IniSection(IniSectionType type, std::string value);
             ~IniSection();
-            IniOption * findFirstOption(std::string key, bool caseSensitive = true, IniOptionType type = IniOptionType::Any, IniOptionSearchField field = IniOptionSearchField::Key);
+            IniOption * findFirstOption(std::string term, bool caseSensitive = true, IniOptionType type = IniOptionType::Any, IniOptionSearchField field = IniOptionSearchField::Key);
             IniOption * findOrCreateFirstOption(std::string key, std::string val, bool caseSensitive = true, IniOptionType type = IniOptionType::Any, IniOptionSearchField field = IniOptionSearchField::Key);
             std::string build();
             static IniSection * parse(std::string line, bool parseComments);
+
+        private:
+            static bool _findElements(const IniOption * obj, std::string term, bool caseSensitive, IniOptionType type, IniOptionSearchField field);
     };
 }

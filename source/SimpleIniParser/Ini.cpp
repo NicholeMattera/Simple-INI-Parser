@@ -25,8 +25,6 @@
 #include "IniOption.hpp"
 #include "IniStringHelper.hpp"
 
-using namespace std;
-
 namespace simpleIniParser {
     Ini::~Ini() {
         magic = "";
@@ -40,8 +38,8 @@ namespace simpleIniParser {
         sections.clear();
     }
 
-    string Ini::build() {
-        string result;
+    std::string Ini::build() {
+        std::string result;
 
         if (magic != "") {
             result += magic + "\n";
@@ -58,7 +56,7 @@ namespace simpleIniParser {
         return result;
     }
 
-    IniOption * Ini::findFirstOption(string term, bool caseSensitive, IniOptionType type, IniOptionSearchField field) {
+    IniOption * Ini::findFirstOption(std::string term, bool caseSensitive, IniOptionType type, IniOptionSearchField field) {
         if (!caseSensitive) {
             IniStringHelper::toupper(term);
         }
@@ -68,7 +66,7 @@ namespace simpleIniParser {
                 return false;
             }
 
-            string fieldValue = "";
+            std::string fieldValue = "";
             if (field == IniOptionSearchField::Key) {
                 fieldValue = (!caseSensitive) ? IniStringHelper::toupper_copy(obj->key) : obj->key;
             } else {
@@ -85,7 +83,7 @@ namespace simpleIniParser {
     }
 
 
-    IniOption * Ini::findOrCreateFirstOption(string key, string val, bool caseSensitive, IniOptionType type, IniOptionSearchField field) {
+    IniOption * Ini::findOrCreateFirstOption(std::string key, std::string val, bool caseSensitive, IniOptionType type, IniOptionSearchField field) {
         auto it = findFirstOption(key, caseSensitive, type, field);
         if (it == nullptr)
         {
@@ -96,7 +94,7 @@ namespace simpleIniParser {
         return it;
     }
 
-    IniSection * Ini::findSection(string term, bool caseSensitive, IniSectionType type) {
+    IniSection * Ini::findSection(std::string term, bool caseSensitive, IniSectionType type) {
         if (!caseSensitive) {
             IniStringHelper::toupper(term);
         }
@@ -106,7 +104,7 @@ namespace simpleIniParser {
                 return false;
             }
 
-            string fieldValue = (!caseSensitive) ? IniStringHelper::toupper_copy(obj->value) : obj->value;
+            std::string fieldValue = (!caseSensitive) ? IniStringHelper::toupper_copy(obj->value) : obj->value;
             return fieldValue == term;
         });
 
@@ -116,7 +114,7 @@ namespace simpleIniParser {
         return (*it);
     }
 
-    IniSection * Ini::findOrCreateSection(string term, bool caseSensitive, IniSectionType type) {
+    IniSection * Ini::findOrCreateSection(std::string term, bool caseSensitive, IniSectionType type) {
         auto it = findSection(term, caseSensitive, type);
         if (it == nullptr)
         {
@@ -127,8 +125,8 @@ namespace simpleIniParser {
         return it;
     }
 
-    bool Ini::writeToFile(string path) {
-        ofstream file(path);
+    bool Ini::writeToFile(std::string path) {
+        std::ofstream file(path);
         if (!file.is_open())
             return false;
 
@@ -142,28 +140,28 @@ namespace simpleIniParser {
         return true;
     }
 
-    Ini * Ini::parseFile(string path) {
-        ifstream file(path);
+    Ini * Ini::parseFile(std::string path) {
+        std::ifstream file(path);
         if (!file.is_open())
             return nullptr;
 
-        stringstream buffer;
+        std::stringstream buffer;
         buffer << file.rdbuf();
         file.close();
 
         return _parseContent(&buffer, "");
     }
     
-    Ini * Ini::parseFileWithMagic(string path, string magic) {
-        ifstream file(path);
+    Ini * Ini::parseFileWithMagic(std::string path, std::string magic) {
+        std::ifstream file(path);
         if (!file.is_open())
             return nullptr;
 
-        stringstream buffer;
+        std::stringstream buffer;
         buffer << file.rdbuf();
         file.close();
 
-        string line;
+        std::string line;
         getline(buffer, line);
         IniStringHelper::trim(line);
         if (line != magic) {
@@ -173,17 +171,17 @@ namespace simpleIniParser {
         return _parseContent(&buffer, magic);
     }
 
-    Ini * Ini::parseOrCreateFile(string path, string magic) {
+    Ini * Ini::parseOrCreateFile(std::string path, std::string magic) {
         auto it = Ini::parseFileWithMagic(path, magic);
         if (it == nullptr)
             it = new Ini();
         return it;
     }
 
-    Ini * Ini::_parseContent(stringstream * content, string magic) {
+    Ini * Ini::_parseContent(std::stringstream * content, std::string magic) {
         Ini * ini = new Ini();
         ini->magic = magic;
-        string line;
+        std::string line;
         while (getline(* content, line)) {
             IniStringHelper::trim(line);
 

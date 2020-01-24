@@ -21,20 +21,19 @@
 #include <SimpleIniParser.hpp>
 
 using namespace simpleIniParser;
-using namespace std;
 
 void writeOption(IniOption * option, bool withTab) {
     switch (option->type) {
         case IniOptionType::SemicolonComment:
-            cout << ((withTab) ? "\t" : "") << "Type: Semicolon Comment, Value: \"" << option->value << "\"\n";
+            std::cout << ((withTab) ? "\t" : "") << "Type: Semicolon Comment, Value: \"" << option->value << "\"\n";
             break;
 
         case IniOptionType::HashtagComment:
-            cout << ((withTab) ? "\t" : "") << "Type: Hashtag Comment, Value: \"" << option->value << "\"\n";
+            std::cout << ((withTab) ? "\t" : "") << "Type: Hashtag Comment, Value: \"" << option->value << "\"\n";
             break;
 
         default:
-            cout << ((withTab) ? "\t" : "") << "Type: Option, Key: \"" << option->key << "\", Value: \"" << option->value << "\"\n";
+            std::cout << ((withTab) ? "\t" : "") << "Type: Option, Key: \"" << option->key << "\", Value: \"" << option->value << "\"\n";
             break;
     }
 }
@@ -42,19 +41,19 @@ void writeOption(IniOption * option, bool withTab) {
 void writeSection(IniSection * section) {
     switch (section->type) {
         case IniSectionType::SemicolonComment:
-            cout << "Type: Semicolon Comment, Value: \"" << section->value << "\"\n";
+            std::cout << "Type: Semicolon Comment, Value: \"" << section->value << "\"\n";
             break;
 
         case IniSectionType::HashtagComment:
-            cout << "Type: Hashtag Comment, Value: \"" << section->value << "\"\n";
+            std::cout << "Type: Hashtag Comment, Value: \"" << section->value << "\"\n";
             break;
 
         case IniSectionType::HekateCaption:
-            cout << "Type: Hekate Caption, Value: \"" << section->value << "\"\n";
+            std::cout << "Type: Hekate Caption, Value: \"" << section->value << "\"\n";
             break;
 
         default:
-            cout << "Type: Section, Value: \"" << section->value << "\"\n";
+            std::cout << "Type: Section, Value: \"" << section->value << "\"\n";
             break;
     }
 
@@ -62,7 +61,7 @@ void writeSection(IniSection * section) {
         writeOption(option, true);
     }
 
-    cout << "\n";
+    std::cout << "\n";
 }
 
 int main(int argc, char **argv) {
@@ -70,13 +69,13 @@ int main(int argc, char **argv) {
 
     Result rc = romfsInit();
     if (R_FAILED(rc)) {
-        cout << "Unable to initialize romfs.\n";
+        std::cout << "Unable to initialize romfs.\n";
     }
     else {
         Ini * config = Ini::parseFile("romfs:/config.ini");
 
-        cout << "Reading through an INI file.\n";
-        cout << "=====================================================\n\n";
+        std::cout << "Reading through an INI file.\n";
+        std::cout << "=====================================================\n\n";
 
 
         for (auto const& option : config->options) {
@@ -84,24 +83,25 @@ int main(int argc, char **argv) {
         }
         
         if (config->options.size() > 0)
-            cout << "\n";
+            std::cout << "\n";
 
         for (auto const& section : config->sections) {
             writeSection(section);
         }
 
-        cout << "\nGet a specific option from a specific section.\n";
-        cout << "=====================================================\n\n";
+        std::cout << "\nGet a specific option from a specific section.\n";
+        std::cout << "=====================================================\n\n";
+
         IniOption * option = config->findSection("config")->findFirstOption("cUsToMlOgO", false);
-        cout << "Key: \"" << option->key << "\" | Value: \"" << option->value << "\"\n";
+        std::cout << "Key: \"" << option->key << "\" | Value: \"" << option->value << "\"\n";
 
         IniOption * option2 = config->findSection("CFW", true, IniSectionType::Section)->findFirstOption("option comment test", false, IniOptionType::HashtagComment, IniOptionSearchField::Value);
-        cout << "Key: \"" << option2->key << "\" | Value: \"" << option2->value << "\"\n\n";
+        std::cout << "Key: \"" << option2->key << "\" | Value: \"" << option2->value << "\"\n\n";
 
         delete config;
     }
 
-    cout << "\nPress any key to close.\n";
+    std::cout << "\nPress any key to close.\n";
 
     while(appletMainLoop())
     {

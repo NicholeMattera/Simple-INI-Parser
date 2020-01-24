@@ -26,15 +26,15 @@ using namespace std;
 void writeOption(IniOption * option, bool withTab) {
     switch (option->type) {
         case IniOptionType::SemicolonComment:
-            cout << ((withTab) ? "\t" : "") << "Type: Semicolon Comment, Value: \"" << option->value << "\"\n";
+            std::cout << ((withTab) ? "\t" : "") << "Type: Semicolon Comment, Value: \"" << option->value << "\"\n";
             break;
 
         case IniOptionType::HashtagComment:
-            cout << ((withTab) ? "\t" : "") << "Type: Hashtag Comment, Value: \"" << option->value << "\"\n";
+            std::cout << ((withTab) ? "\t" : "") << "Type: Hashtag Comment, Value: \"" << option->value << "\"\n";
             break;
 
         default:
-            cout << ((withTab) ? "\t" : "") << "Type: Option, Key: \"" << option->key << "\", Value: \"" << option->value << "\"\n";
+            std::cout << ((withTab) ? "\t" : "") << "Type: Option, Key: \"" << option->key << "\", Value: \"" << option->value << "\"\n";
             break;
     }
 }
@@ -42,19 +42,19 @@ void writeOption(IniOption * option, bool withTab) {
 void writeSection(IniSection * section) {
     switch (section->type) {
         case IniSectionType::SemicolonComment:
-            cout << "Type: Semicolon Comment, Value: \"" << section->value << "\"\n";
+            std::cout << "Type: Semicolon Comment, Value: \"" << section->value << "\"\n";
             break;
 
         case IniSectionType::HashtagComment:
-            cout << "Type: Hashtag Comment, Value: \"" << section->value << "\"\n";
+            std::cout << "Type: Hashtag Comment, Value: \"" << section->value << "\"\n";
             break;
 
         case IniSectionType::HekateCaption:
-            cout << "Type: Hekate Caption, Value: \"" << section->value << "\"\n";
+            std::cout << "Type: Hekate Caption, Value: \"" << section->value << "\"\n";
             break;
 
         default:
-            cout << "Type: Section, Value: \"" << section->value << "\"\n";
+            std::cout << "Type: Section, Value: \"" << section->value << "\"\n";
             break;
     }
 
@@ -62,7 +62,7 @@ void writeSection(IniSection * section) {
         writeOption(option, true);
     }
 
-    cout << "\n";
+    std::cout << "\n";
 }
 
 int main(int argc, char **argv) {
@@ -70,8 +70,8 @@ int main(int argc, char **argv) {
 
     Ini * config = Ini::parseFileWithMagic("sdmc:/atmosphere/BCT.ini", "BCT0");
 
-    cout << "Reading through an INI file.\n";
-    cout << "=====================================================\n\n";
+    std::cout << "Reading through an INI file.\n";
+    std::cout << "=====================================================\n\n";
 
 
     for (auto const& option : config->options) {
@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
     }
     
     if (config->options.size() > 0)
-        cout << "\n";
+        std::cout << "\n";
 
     for (auto const& section : config->sections) {
         writeSection(section);
@@ -93,13 +93,13 @@ int main(int argc, char **argv) {
 
             config->writeToFile("sdmc:/BCT.ini");
 
-            cout << "Modified version of BCT.ini has been writen to the root of your SD Card.\n";
+            std::cout << "Modified version of BCT.ini has been writen to the root of your SD Card.\n";
         }
     }
 
     delete config;
 
-    cout << "\nPress any key to close.\n";
+    std::cout << "\nPress any key to close.\n";
 
     while(appletMainLoop())
     {

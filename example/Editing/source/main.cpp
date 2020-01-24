@@ -21,16 +21,24 @@
 #include <SimpleIniParser.hpp>
 
 using namespace simpleIniParser;
-using namespace std;
 
-void copy_file(string srcPath, string destPath);
+void copy_file(std::string srcPath, std::string destPath) {
+    std::ifstream src(srcPath, std::ios::binary);
+    std::ofstream dest(destPath, std::ios::binary);
+
+    dest << src.rdbuf();
+
+    src.close();
+    dest.flush();
+    dest.close();
+}
 
 int main(int argc, char **argv) {
     consoleInit(NULL);
 
     Result rc = romfsInit();
     if (R_FAILED(rc)) {
-        cout << "Unable to initialize romfs.\n";
+        std::cout << "Unable to initialize romfs.\n";
     }
     else {
         copy_file("romfs:/config.ini", "sdmc:/example1.ini");
@@ -45,9 +53,9 @@ int main(int argc, char **argv) {
 
         delete exampleIni;
     }
-    cout << "Original file written to: sdmc:/example1.ini\n";
-    cout << "Modified file written to: sdmc:/example2.ini\n\n";
-    cout << "Press any key to close.\n";
+    std::cout << "Original file written to: sdmc:/example1.ini\n";
+    std::cout << "Modified file written to: sdmc:/example2.ini\n\n";
+    std::cout << "Press any key to close.\n";
 
     while(appletMainLoop())
     {
@@ -60,15 +68,4 @@ int main(int argc, char **argv) {
 
     consoleExit(NULL);
     return 0;
-}
-
-void copy_file(string srcPath, string destPath) {
-    ifstream src(srcPath, ios::binary);
-    ofstream dest(destPath, ios::binary);
-
-    dest << src.rdbuf();
-
-    src.close();
-    dest.flush();
-    dest.close();
 }

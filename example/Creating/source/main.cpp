@@ -21,7 +21,6 @@
 #include <SimpleIniParser.hpp>
 
 using namespace simpleIniParser;
-using namespace std;
 
 int main(int argc, char **argv) {
     consoleInit(NULL);
@@ -56,12 +55,12 @@ int main(int argc, char **argv) {
     hekateIni->sections.push_back(stockSection);
 
     if (hekateIni->writeToFile("sdmc:/example.ini")) {
-        cout << "Ini file writen to: sdmc:/example.ini\n";
+        std::cout << "Ini file writen to: sdmc:/example.ini\n";
     }
 
     delete hekateIni;
 
-    cout << "Press any key to close.\n";
+    std::cout << "Press any key to close.\n";
 
     while(appletMainLoop())
     {

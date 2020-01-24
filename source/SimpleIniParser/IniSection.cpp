@@ -21,10 +21,8 @@
 #include "IniSection.hpp"
 #include "IniStringHelper.hpp"
 
-using namespace std;
-
 namespace simpleIniParser {
-    IniSection::IniSection(IniSectionType t, string v) {
+    IniSection::IniSection(IniSectionType t, std::string v) {
         type = t;
         value = v;
     }
@@ -39,25 +37,23 @@ namespace simpleIniParser {
         options.clear();
     }
 
-    IniOption * IniSection::findFirstOption(string term, bool caseSensitive, IniOptionType type, IniOptionSearchField field) {
+    IniOption * IniSection::findFirstOption(std::string term, bool caseSensitive, IniOptionType type, IniOptionSearchField field) {
         if (!caseSensitive) {
             IniStringHelper::toupper(term);
         }
 
-        auto it = find_if(options.begin(), options.end(), [&term, &caseSensitive, &type, &field](const IniOption * obj) {
-            if (type != IniOptionType::Any && type != obj->type) {
-                return false;
-            }
-
-            string fieldValue = "";
-            if (field == IniOptionSearchField::Key) {
-                fieldValue = (!caseSensitive) ? IniStringHelper::toupper_copy(obj->key) : obj->key;
-            } else {
-                fieldValue = (!caseSensitive) ? IniStringHelper::toupper_copy(obj->value) : obj->value;
-            }
-
-            return fieldValue == term;
-        });
+        auto it = std::find_if(
+            options.begin(),
+            options.end(),
+            std::bind(
+                _findElements,
+                std::placeholders::_1,
+                term,
+                caseSensitive,
+                type,
+                field
+            )
+        );
 
         if (it == options.end())
             return nullptr;
@@ -65,7 +61,7 @@ namespace simpleIniParser {
         return (*it);
     }
 
-    IniOption * IniSection::findOrCreateFirstOption(string key, string val, bool caseSensitive, IniOptionType type, IniOptionSearchField field) {
+    IniOption * IniSection::findOrCreateFirstOption(std::string key, std::string val, bool caseSensitive, IniOptionType type, IniOptionSearchField field) {
         auto it = findFirstOption(key, caseSensitive, type, field);
         if (it == nullptr)
         {
@@ -76,7 +72,7 @@ namespace simpleIniParser {
         return it;
     }
 
-    string IniSection::build() {
+    std::string IniSection::build() {
         switch (type) {
             case IniSectionType::HekateCaption:
                 return "\n{" + value + "}\n";
@@ -88,7 +84,7 @@ namespace simpleIniParser {
                 return "\n# " + value + "\n";
 
             default:
-                string result = "\n[" + value + "]\n";
+                std::string result = "\n[" + value + "]\n";
 
                 for (auto const& option : options) {
                     result += option->build();
@@ -98,7 +94,7 @@ namespace simpleIniParser {
         }
     }
 
-    IniSection * IniSection::parse(string line, bool parseComments) {
+    IniSection * IniSection::parse(std::string line, bool parseComments) {
         if (line.at(0) == '{' && line.at(line.size() - 1) == '}') {
             return new IniSection(IniSectionType::HekateCaption, IniStringHelper::trim_copy(line.substr(1, line.size() - 2)));
         } else if (parseComments && line.at(0) == ';') {
@@ -110,5 +106,20 @@ namespace simpleIniParser {
         } else {
             return nullptr;
         }
+    }
+
+    bool IniSection::_findElements(const IniOption * obj, std::string term, bool caseSensitive, IniOptionType type, IniOptionSearchField field) {
+        if (type != IniOptionType::Any && type != obj->type) {
+            return false;
+        }
+        
+        std::string fieldValue = "";
+        if (field == IniOptionSearchField::Key) {
+            fieldValue = (!caseSensitive) ? IniStringHelper::toupper_copy(obj->key) : obj->key;
+        } else {
+            fieldValue = (!caseSensitive) ? IniStringHelper::toupper_copy(obj->value) : obj->value;
+        }
+
+        return fieldValue == term;
     }
 }

@@ -18,16 +18,14 @@
 #include "IniOption.hpp"
 #include "IniStringHelper.hpp"
 
-using namespace std;
-
 namespace simpleIniParser {
-    IniOption::IniOption(IniOptionType t, string k, string v) {
+    IniOption::IniOption(IniOptionType t, std::string k, std::string v) {
         type = t;
         key = k;
         value = v;
     }
 
-    string IniOption::build() {
+    std::string IniOption::build() {
         switch (type) {
             case IniOptionType::SemicolonComment:
                 return "; " + value + "\n";
@@ -40,14 +38,14 @@ namespace simpleIniParser {
         }
     }
 
-    IniOption * IniOption::parse(string line) {
+    IniOption * IniOption::parse(std::string line) {
         if (line.at(0) == ';') {
             return new IniOption(IniOptionType::SemicolonComment, "", IniStringHelper::trim_copy(line.substr(1, line.size() - 1)));
         } else if (line.at(0) == '#') {
             return new IniOption(IniOptionType::HashtagComment, "", IniStringHelper::trim_copy(line.substr(1, line.size() - 1)));
         } else {
             size_t pos = line.find('=');
-            if (pos != string::npos && pos > 0) {
+            if (pos != std::string::npos && pos > 0) {
                 return new IniOption(IniOptionType::Option, IniStringHelper::rtrim_copy(line.substr(0, pos)), IniStringHelper::ltrim_copy(line.substr(pos + 1)));
             } else {
                 return nullptr;
