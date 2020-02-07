@@ -34,7 +34,7 @@ namespace simpleIniParser {
         return fieldValue == term;
     }
 
-    bool findSection(const IniSection * obj, std::string term, bool caseSensitive, IniSectionType type) {
+    bool IniHelper::findSection(const IniSection * obj, std::string term, bool caseSensitive, IniSectionType type) {
         if (type != IniSectionType::Any && type != obj->type) {
             return false;
         }
