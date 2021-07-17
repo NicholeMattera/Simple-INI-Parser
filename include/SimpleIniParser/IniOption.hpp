@@ -1,6 +1,6 @@
 /*
- * SimpleIniParser
- * Copyright (c) 2020 Nichole Mattera
+ * Simple INI Parser
+ * Copyright (c) 2021 Nichole Mattera
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above 

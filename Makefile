@@ -15,14 +15,14 @@ include $(DEVKITPRO)/libnx/switch_rules
 # INCLUDES is a list of directories containing header files
 #---------------------------------------------------------------------------------
 TARGET		:=	SimpleIniParser
-VERSION		:= 	1.0.0
+VERSION		:= 	2.1.1
 SOURCES		:=	source source/SimpleIniParser
 INCLUDES	:=	include include/SimpleIniParser
 
 #---------------------------------------------------------------------------------
 # options for code generation
 #---------------------------------------------------------------------------------
-ARCH	:=	-march=armv8-a -mtune=cortex-a57 -mtp=soft -fPIC -ftls-model=local-exec
+ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIC -ftls-model=local-exec
 
 CFLAGS	:=	-g -Wall -Werror \
 			-ffunction-sections \
@@ -36,16 +36,11 @@ CXXFLAGS	:= $(CFLAGS) -fno-rtti -fno-exceptions
 
 ASFLAGS	:=	-g $(ARCH)
 
-ifneq (,$(shell which ccache))
-	CXX		:=	$(shell which ccache) $(CXX)
-	CC		:=	$(shell which ccache) $(CC)
-endif
-
 #---------------------------------------------------------------------------------
 # list of directories containing libraries, this must be the top level containing
 # include and lib
 #---------------------------------------------------------------------------------
-LIBDIRS	:= $(PORTLIBS) $(LIBNX)
+LIBDIRS := $(PORTLIBS) $(LIBNX)
 
 #---------------------------------------------------------------------------------
 # no real need to edit anything past this point unless you need to add additional
@@ -83,8 +78,7 @@ export HFILES	:=	$(addsuffix .h,$(subst .,_,$(BINFILES)))
 
 export INCLUDE	:=	$(foreach dir,$(INCLUDES),-I$(CURDIR)/$(dir)) \
 			$(foreach dir,$(LIBDIRS),-I$(dir)/include) \
-			-I. \
-			-iquote $(CURDIR)/include/switch/
+			-I$(CURDIR)/$(BUILD)
 
 .PHONY: clean all
 
@@ -113,6 +107,14 @@ lib/lib$(TARGET)d.a : lib debug $(SOURCES) $(INCLUDES)
 	DEPSDIR=$(CURDIR)/debug \
 	--no-print-directory -C debug \
 	-f $(CURDIR)/Makefile
+
+dist-bin: all
+	@tar --exclude=*~ -cjf lib$(TARGET).tar.bz2 include lib
+
+dist-src:
+	@tar --exclude=*~ -cjf lib$(TARGET)-src.tar.bz2 include source Makefile
+
+dist: dist-src dist-bin
 
 #---------------------------------------------------------------------------------
 clean:
