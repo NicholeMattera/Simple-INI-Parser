@@ -19,13 +19,22 @@
 
 #include <string>
 
-#include "IniOption.hpp"
-#include "IniSection.hpp"
+namespace sini {
 
-namespace simpleIniParser {
-    class IniHelper {
+    class Ini {
         public:
-            static bool findOption(const IniOption * obj, std::string term, bool caseSensitive, IniOptionType type, IniOptionSearchField field);
-            static bool findSection(const IniSection * obj, std::string term, bool caseSensitive, IniSectionType type);
+            static Ini ParseFile(const std::string &path);
+            static inline Ini ParseData(const std::string &data) {
+                return Ini(data);
+            }
+
+            Ini() = default;
+
+            std::string magic;
+
+        private:
+            Ini(const std::string &data);
+
     };
+
 }

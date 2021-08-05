@@ -17,29 +17,37 @@
 
 #pragma once
 
+#include <cstdint>
 #include <string>
 
-namespace simpleIniParser {
-    enum class IniOptionType {
-        Any,
-        Option,
-        SemicolonComment,
-        HashtagComment,
-    };
+namespace sini {
 
-    enum class IniOptionSearchField {
-        Key,
-        Value
-    };
-
-    class IniOption {
+    template<typename T>
+    class Option {
         public:
-            IniOptionType type;
-            std::string key;
-            std::string value;
+            enum class Type : std::uint8_t {
+                Option,
+                Section,
+                HashtagComment,
+                SemicolonComment,
+                HekateCaption,
+            };
 
-            IniOption(IniOptionType type, std::string key, std::string val);
-            std::string build();
-            static IniOption * parse(std::string line);
+            Type type;
+            std::string key;
+            T value;
+
+            Option(Type type, const std::string &key, const T &value) : type(type), key(key), value(value) {}
     };
+
 }
+
+template<typename T>
+Option<T> CreateOption(const std::string &key, const T &value) {
+
+}
+
+Option<OptionArray> CreateSection(const std::string &name);
+Option<std::string> CreateHashComment(const std::string &comment);
+Option<std::string> CreateSemicolonComment(const std::string &comment);
+Option<std::string> CreateHekateCaption(const std::string &caption);

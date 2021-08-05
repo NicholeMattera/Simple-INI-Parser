@@ -15,8 +15,19 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include "SimpleIniParser/Ini.hpp"
-#include "SimpleIniParser/IniHelper.hpp"
-#include "SimpleIniParser/IniSection.hpp"
-#include "SimpleIniParser/IniOption.hpp"
-#include "SimpleIniParser/IniStringHelper.hpp"
+#pragma once
+
+#include <string>
+
+namespace sini {
+
+    class OptionArray {
+        public:
+            
+
+        private:
+
+            
+    };
+
+}

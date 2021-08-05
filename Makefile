@@ -15,7 +15,8 @@ include $(DEVKITPRO)/libnx/switch_rules
 # INCLUDES is a list of directories containing header files
 #---------------------------------------------------------------------------------
 TARGET		:=	SimpleIniParser
-VERSION		:= 	2.1.1
+BUILD		:=	build-nx
+VERSION		:= 	3.0.0
 SOURCES		:=	source source/SimpleIniParser
 INCLUDES	:=	include include/SimpleIniParser
 
