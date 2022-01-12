@@ -17,6 +17,7 @@
 
 #include <cstdio>
 #include <exception>
+#include <stdexcept>
 
 #include <sini.hpp>
 
@@ -25,7 +26,7 @@ namespace sini {
     Ini Ini::ParseFile(const std::string &path) {
         const auto fp = std::fopen(path.c_str(), "r");
         if (fp == nullptr) {
-            throw std::invalid_argrument("File does not exist");
+            throw std::invalid_argument("File does not exist");
         }
 
         if (std::fseek(fp, 0, SEEK_END) != 0) {
@@ -47,16 +48,12 @@ namespace sini {
         auto data = std::string(size, '0');
         if (std::fread(data.data(), size, 1, fp) != 1) {
             std::fclose(fp);
-            throw std::runtime_error('Reading data failed');
+            throw std::runtime_error("Reading data failed");
         }
 
         std::fclose(fp);
 
         return Ini(data);
-    }
-
-    Ini::Ini(const std::string &data) {
-
     }
 
 }
