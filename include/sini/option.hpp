@@ -17,8 +17,10 @@
 
 #pragma once
 
+#include <any>
 #include <cstdint>
 #include <string>
+#include <utility>
 
 namespace sini {
 
@@ -30,32 +32,32 @@ namespace sini {
         HekateCaption,
     };
 
-    template<typename ValueType>
     class Option {
         public:
             OptionType optionType;
             std::string key;
-            ValueType value;
+            std::any value;
 
-            Option(OptionType optionType, const std::string &key, const ValueType &value) : optionType(optionType), key(key), value(value) {}
+            template<typename ValueType>
+            Option(OptionType optionType, std::string key, ValueType &&value) : optionType(optionType), key(std::move(key)), value(std::forward<ValueType>(value)) {}
 
     };
 
     template<typename ValueType>
-    Option<ValueType> CreateOption(const std::string &key, const ValueType &value) {
-        return Option<ValueType>(OptionType::Option, key, value);
+    Option CreateOption(const std::string &key, ValueType &&value) {
+        return Option(OptionType::Option, key, std::forward<ValueType>(value));
     }
 
-    Option<std::string> CreateHashComment(const std::string &comment) {
-        return Option<std::string>(OptionType::HashComment, "", comment);
+    Option CreateHashComment(const std::string &comment) {
+        return Option(OptionType::HashComment, "", comment);
     }
 
-    Option<std::string> CreateSemicolonComment(const std::string &comment) {
-        return Option<std::string>(OptionType::SemicolonComment, "", comment);
+    Option CreateSemicolonComment(const std::string &comment) {
+        return Option(OptionType::SemicolonComment, "", comment);
     }
 
-    Option<std::string> CreateHekateCaption(const std::string &caption) {
-        return Option<std::string>(OptionType::HekateCaption, "", caption);
+    Option CreateHekateCaption(const std::string &caption) {
+        return Option(OptionType::HekateCaption, "", caption);
     }
 
 }

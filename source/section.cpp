@@ -15,46 +15,26 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <algorithm>
 #include <stdexcept>
-#include <type_traits>
 
 #include <sini.hpp>
 
 namespace sini {
-    template<typename ValueType>
-    Option<ValueType> Section::getOption(size_t index) {
-        if (index >= _options.size()) {
+    Option Section::operator[](size_t index) {
+        if (index >= m_options.size()) {
             throw std::out_of_range("Index out of range");
         }
 
-        auto option = _options[index];
-        return std::visit([](auto&& arg) -> Option<ValueType> {
-            using OptionValueType = std::decay_t<decltype(arg)>;
-            if constexpr (std::is_same_v<OptionValueType, ValueType>) {
-                return arg;
-            } else {
-                throw std::invalid_argument("Option does not exist");
-            }
-        });
+        return m_options[index];
     }
     
-    template<typename ValueType>
-    std::vector<Option<ValueType>> Section::getOptions(const std::string &key) {
-        std::vector<Option<ValueType>> matchOptions;
-        for (auto& option: _options) {
-            std::visit([matchOptions, key](auto&& arg) {
-                using OptionValueType = std::decay_t<decltype(arg)>;
-                if constexpr (!std::is_same_v<OptionValueType, ValueType>) {
-                    return;
-                }
+    std::vector<Option> Section::getOptions(const std::string &key) {
+        std::vector<Option> matchOptions;
 
-                if (arg.key != key) {
-                    return;
-                }
-
-                matchOptions.push_back(arg);
-            });
-        }
+        std::ranges::copy_if(m_options,
+            std::back_inserter(matchOptions),
+            [&](Option option) { return option.key == key; });
 
         return matchOptions;
     }

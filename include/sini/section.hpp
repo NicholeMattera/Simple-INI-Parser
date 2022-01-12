@@ -28,20 +28,16 @@ namespace sini {
 
     class Section {
         public:
-            template<typename ValueType>
-            Option<ValueType> getOption(size_t index);
-            
-            template<typename ValueType>
-            std::vector<Option<ValueType>> getOptions(const std::string &key);
+            Option operator[](size_t index);
+            std::vector<Option> getOptions(const std::string &key);
 
         private:
-            using OptionVariant = std::variant<Option<bool>, Option<int>, Option<double>, Option<std::string>, Option<std::any>>;
-            std::vector<OptionVariant> _options;
+            std::vector<Option> m_options;
     
     };
 
-    Option<Section> CreateSection(const std::string &name) {
-        return Option<Section>(OptionType::Section, name, Section());
+    Option CreateSection(const std::string &name) {
+        return Option(OptionType::Section, name, Section());
     }
 
 }
