@@ -15,8 +15,8 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#pragma once
+#include <sini.hpp>
 
-#include "sini/ini.hpp"
-#include "sini/option.hpp"
-#include "sini/section.hpp"
+namespace sini {
+
+}

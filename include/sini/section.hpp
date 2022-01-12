@@ -1,6 +1,6 @@
 /*
  * Simple INI Parser
- * Copyright (c) 2021 Nichole Mattera
+ * Copyright (c) 2022 Nichole Mattera
  * 
  * Permission to use, copy, modify, and/or distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above 
@@ -17,17 +17,31 @@
 
 #pragma once
 
+#include <any>
 #include <string>
+#include <variant>
+#include <vector>
+
+#include "option.hpp"
 
 namespace sini {
 
-    class OptionArray {
+    class Section {
         public:
+            template<typename ValueType>
+            Option<ValueType> getOption(size_t index);
             
+            template<typename ValueType>
+            std::vector<Option<ValueType>> getOptions(const std::string &key);
 
         private:
-
-            
+            using OptionVariant = std::variant<Option<bool>, Option<int>, Option<double>, Option<std::string>, Option<std::any>>;
+            std::vector<OptionVariant> _options;
+    
     };
+
+    Option<Section> CreateSection(const std::string &name) {
+        return Option<Section>(OptionType::Section, name, Section());
+    }
 
 }

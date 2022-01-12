@@ -22,32 +22,40 @@
 
 namespace sini {
 
-    template<typename T>
-    class Option {
-        public:
-            enum class Type : std::uint8_t {
-                Option,
-                Section,
-                HashtagComment,
-                SemicolonComment,
-                HekateCaption,
-            };
-
-            Type type;
-            std::string key;
-            T value;
-
-            Option(Type type, const std::string &key, const T &value) : type(type), key(key), value(value) {}
+    enum class OptionType : std::uint8_t {
+        Option,
+        Section,
+        HashComment,
+        SemicolonComment,
+        HekateCaption,
     };
 
+    template<typename ValueType>
+    class Option {
+        public:
+            OptionType optionType;
+            std::string key;
+            ValueType value;
+
+            Option(OptionType optionType, const std::string &key, const ValueType &value) : optionType(optionType), key(key), value(value) {}
+
+    };
+
+    template<typename ValueType>
+    Option<ValueType> CreateOption(const std::string &key, const ValueType &value) {
+        return Option<ValueType>(OptionType::Option, key, value);
+    }
+
+    Option<std::string> CreateHashComment(const std::string &comment) {
+        return Option<std::string>(OptionType::HashComment, "", comment);
+    }
+
+    Option<std::string> CreateSemicolonComment(const std::string &comment) {
+        return Option<std::string>(OptionType::SemicolonComment, "", comment);
+    }
+
+    Option<std::string> CreateHekateCaption(const std::string &caption) {
+        return Option<std::string>(OptionType::HekateCaption, "", caption);
+    }
+
 }
-
-template<typename T>
-Option<T> CreateOption(const std::string &key, const T &value) {
-
-}
-
-Option<OptionArray> CreateSection(const std::string &name);
-Option<std::string> CreateHashComment(const std::string &comment);
-Option<std::string> CreateSemicolonComment(const std::string &comment);
-Option<std::string> CreateHekateCaption(const std::string &caption);
